@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<openimmo>
+  <uebertragung art="ONLINE" umfang="TEIL" version="1.0" sendersoftware="my-software" senderversion="v1"/>
+  <anbieter>
+    <firma>Joe LLC</firma>
+    <openimmo_anid>UH321890UA9</openimmo_anid>
+  </anbieter>
+</openimmo>

@@ -1,0 +1,43 @@
+{
+    "name": "typexml",
+    "version": "0.1.0",
+    "description": "Type-safe xml builder base in xsd for Typescript environments",
+    "main": "build/index.js",
+    "bin": "build/index.js",
+    "files": [
+        "build"
+    ],
+    "scripts": {
+        "build": "rm -rf build && tsc",
+        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
+    },
+    "keywords": [
+        "xsd",
+        "xml",
+        "interfaces",
+        "builder",
+        "typescript",
+        "converter"
+    ],
+    "author": "Marco Silva<marco.up.bsi@gmail.com> (https://github.com/marcoasilva)",
+    "license": "MIT",
+    "dependencies": {
+        "change-case": "^4.1.2",
+        "lodash": "^4.17.21",
+        "xml-js": "^1.6.11",
+        "xmlbuilder": "^15.1.1",
+        "xsd-validator": "^1.0.2"
+    },
+    "devDependencies": {
+        "@types/lodash": "4.14.182",
+        "@types/mocha": "^9.1.1",
+        "@types/node": "^18.11.9",
+        "@types/xmlbuilder": "^11.0.1",
+        "eslint": "^8.17.0",
+        "mocha": "^10.2.0",
+        "prettier": "^2.6.2",
+        "ts-node": "^10.9.1",
+        "ts-toolbelt": "^9.6.0",
+        "typescript": "^5.0.2"
+    }
+}
