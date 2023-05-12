@@ -1,25 +1,25 @@
-import { writeFileSync } from "fs";
-import { createBuilder } from "../src";
-import { Schema } from "./interfaces";
+import { writeFileSync } from 'fs';
+import { createBuilder } from '../src';
+import { Schema } from './interfaces';
 
 const schema: Schema = {
     openimmo: {
         uebertragung: {
-            art: "ONLINE",
-            sendersoftware: "my-software",
-            senderversion: "v1",
-            umfang: "TEIL",
-            version: "1.0",
+            art: 'ONLINE',
+            sendersoftware: 'my-software',
+            senderversion: 'v1',
+            umfang: 'TEIL',
+            version: '1.0',
         },
         anbieter: {
-            firma: "Joe LLC",
-            openimmo_anid: "UH321890UA9",
+            firma: 'Joe LLC',
+            openimmo_anid: 'UH321890UA9',
         },
     },
 };
 
-const build = createBuilder({ xsdFilePath: "openimmo_127b.xsd" });
+const build = createBuilder({ xsdFilePath: 'openimmo_127b.xsd' });
 
-const xml = build(schema, "openimmo");
+const xml = build(schema, 'openimmo');
 
-writeFileSync("output.xml", xml);
+writeFileSync('output.xml', xml);

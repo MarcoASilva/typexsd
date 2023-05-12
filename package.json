@@ -1,6 +1,6 @@
 {
     "name": "typexml",
-    "version": "0.1.0",
+    "version": "0.2.1",
     "description": "Type-safe xml builder base in xsd for Typescript environments",
     "main": "build/index.js",
     "bin": "build/index.js",
@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "build": "rm -rf build && tsc",
+        "format": "prettier --write .",
         "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
     },
     "keywords": [
@@ -25,10 +26,10 @@
         "change-case": "^4.1.2",
         "lodash": "^4.17.21",
         "xml-js": "^1.6.11",
-        "xmlbuilder": "^15.1.1",
-        "xsd-validator": "^1.0.2"
+        "xmlbuilder": "^15.1.1"
     },
     "devDependencies": {
+        "@peker/prettier-config": "^1.1.1",
         "@types/lodash": "4.14.182",
         "@types/mocha": "^9.1.1",
         "@types/node": "^18.11.9",

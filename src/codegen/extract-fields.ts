@@ -1,7 +1,7 @@
-import { readFileSync, writeFileSync } from "fs";
-import { isNil, isUndefined, omitBy } from "lodash";
-import { AtLeast } from "ts-toolbelt/out/Object/AtLeast";
-import { xml2js, Element, Attributes } from "xml-js";
+import { readFileSync, writeFileSync } from 'fs';
+import { isNil, isUndefined, omitBy } from 'lodash';
+import { AtLeast } from 'ts-toolbelt/out/Object/AtLeast';
+import { xml2js, Element, Attributes } from 'xml-js';
 
 export interface Prop {
     name: string;
@@ -18,12 +18,12 @@ export interface Prop {
 
 export type ReferenceProp = Pick<
     Prop,
-    "name" | "required" | "choice" | "isAttr" | "reference" | "extend"
+    'name' | 'required' | 'choice' | 'isAttr' | 'reference' | 'extend'
 >;
 
 export type PrimitiveProp = Pick<
     Prop,
-    "name" | "required" | "choice" | "isAttr" | "type" | "values"
+    'name' | 'required' | 'choice' | 'isAttr' | 'type' | 'values'
 >;
 
 export interface Interface {
@@ -43,50 +43,43 @@ interface XsdElement extends Element {
 class SchemaNotFoundError extends Error {
     constructor(public declaration: Element) {
         super(
-            "Could not build interfaces. Reason: schema was not found in the provided xsd"
+            'Could not build interfaces. Reason: schema was not found in the provided xsd',
         );
     }
 }
 
-// export const isRef = (field: any): field is Ref => Boolean(field.ref);
-
 const asReferenceProp = (field: Interface & Prop): ReferenceProp => {
     const { name, required, reference, extend, choice } = field;
-    // return { name, required, reference, extend, choice };
     return omitBy(
         { name, required, reference, extend, choice },
-        isUndefined
+        isUndefined,
     ) as ReferenceProp;
 };
 
 const asPrimitiveProp = (field: Interface & Prop): PrimitiveProp => {
     const { name, required, type, values, choice } = field;
-    // return { name, required, type, values, choice };
     return omitBy(
         { name, required, type, values, choice },
-        isUndefined
+        isUndefined,
     ) as PrimitiveProp;
 };
 
 const asProp = (field: Interface & Prop): Prop => {
     const { name, required, reference, extend, type, values, choice } = field;
-    // return { name, required, reference, extend, type, values, choice };
     return omitBy(
         { name, required, reference, extend, type, values, choice },
-        isUndefined
+        isUndefined,
     ) as unknown as Prop;
 };
 
 const asInterface = (field: Interface & Prop): Interface => {
     const { name, props, extend } = field;
-    // return field as Interface;
-    // return { name, props, extend };
     return omitBy({ name, props, extend }, isUndefined) as unknown as Interface;
 };
 
 const createReferenceProp = (
     element: Element,
-    scope: Scope | undefined
+    scope: Scope | undefined,
 ): ReferenceProp => {
     return {
         name: String(element.attributes?.ref || element.attributes?.name),
@@ -97,9 +90,9 @@ const createReferenceProp = (
 };
 
 const isRequired = (element: Element): boolean => {
-    if (type(element) === "attribute") {
+    if (type(element) === 'attribute') {
         // default false for attributes
-        return element.attributes?.use === "required";
+        return element.attributes?.use === 'required';
     }
 
     // default true for others
@@ -110,18 +103,18 @@ const isRequired = (element: Element): boolean => {
 };
 
 const type = (element: Element): string => {
-    return String(element.name?.split("xsd:")[1]);
+    return String(element.name?.split('xsd:')[1]);
 };
 
 const any = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
-    field.type = "any";
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    field.type = 'any';
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -129,11 +122,11 @@ const extension = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     const ref = String(element.attributes?.base);
 
-    const native = ref.split("xsd:")[1];
+    const native = ref.split('xsd:')[1];
 
     if (native) {
         field.extend = native;
@@ -141,8 +134,8 @@ const extension = (
         field.extend = ref;
     }
 
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -150,10 +143,10 @@ const simpleContent = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -161,10 +154,10 @@ const complexContent = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -172,14 +165,14 @@ const enumeration = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     if (!field.values) {
         field.values = [];
     }
     field.values.push(String(element.attributes?.value));
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -193,15 +186,15 @@ const restriction = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     field.type =
-        String(element.attributes?.base)?.split("xsd:")[1] ??
+        String(element.attributes?.base)?.split('xsd:')[1] ??
         (field.type && String(field.type)) ??
         (element.attributes?.base && String(element.attributes?.base));
 
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -209,7 +202,7 @@ const simpleType = (
     element: Element,
     parent: Interface,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     if (element.attributes?.name) {
         const field: Prop & Interface = {
@@ -223,8 +216,8 @@ const simpleType = (
             field.type = cleanType(String(element.attributes?.type));
         }
 
-        element.elements?.forEach((e) =>
-            processType(type(e), e, field, scope, declarations)
+        element.elements?.forEach(e =>
+            processType(type(e), e, field, scope, declarations),
         );
 
         if (field.props.length) {
@@ -234,8 +227,8 @@ const simpleType = (
             parent.props.push(asPrimitiveProp(field));
         }
     } else {
-        element.elements?.forEach((e) =>
-            processType(type(e), e, parent, scope, declarations)
+        element.elements?.forEach(e =>
+            processType(type(e), e, parent, scope, declarations),
         );
     }
 };
@@ -244,7 +237,7 @@ const complexType = (
     element: Element,
     parent: Interface,
     scope?: Scope,
-    declarations?: Map<string, Interface>
+    declarations?: Map<string, Interface>,
 ) => {
     if (element.attributes?.name) {
         parent.props.push(createReferenceProp(element, scope));
@@ -253,21 +246,14 @@ const complexType = (
             props: [],
         };
 
-        element.elements?.forEach((e) =>
-            processType(type(e), e, _interface, scope, declarations)
+        element.elements?.forEach(e =>
+            processType(type(e), e, _interface, scope, declarations),
         );
 
         declarations?.set(_interface.name, _interface);
-
-        // parent.props.push({
-        //     name: _interface.name,
-        //     required: isRequired(element),
-        //     choice: scope?.choice,
-        //     reference: _interface.name,
-        // });
     } else {
-        element.elements?.forEach((e) =>
-            processType(type(e), e, parent, scope, declarations)
+        element.elements?.forEach(e =>
+            processType(type(e), e, parent, scope, declarations),
         );
     }
 };
@@ -276,10 +262,10 @@ const sequence = (
     element: Element,
     field: Prop,
     scope?: Scope,
-    declarations?: Map<string, Interface>
+    declarations?: Map<string, Interface>,
 ) => {
-    element.elements?.forEach((e) =>
-        processType(type(e), e, field, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, field, scope, declarations),
     );
 };
 
@@ -287,17 +273,17 @@ const choice = (
     element: Element,
     field: Prop,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     element.elements?.forEach((e, i) =>
-        processType(type(e), e, field, { ...scope, choice: i }, declarations)
+        processType(type(e), e, field, { ...scope, choice: i }, declarations),
     );
 };
 const cleanType = (type: string | undefined) => {
-    if (type?.includes("xsd:")) {
-        return String(type.split("xsd:")[1]);
+    if (type?.includes('xsd:')) {
+        return String(type.split('xsd:')[1]);
     }
-    if (type === undefined || type === "undefined") return "definition";
+    if (type === undefined || type === 'undefined') return 'definition';
     return type;
 };
 
@@ -305,7 +291,7 @@ const attribute = (
     element: Element,
     parent: Interface,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ) => {
     const attrField: Prop = {
         name: String(element.attributes?.name),
@@ -318,8 +304,8 @@ const attribute = (
     }
 
     if (element.elements) {
-        element.elements.forEach((e) =>
-            processType(type(e), e, attrField, scope, declarations)
+        element.elements.forEach(e =>
+            processType(type(e), e, attrField, scope, declarations),
         );
     }
 
@@ -330,15 +316,9 @@ const element = (
     element: XsdElement,
     parent: Interface,
     scope: Scope,
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ): void | Prop => {
     if (element.attributes.ref) {
-        // parent.props.push({
-        //     name: String(element.attributes?.ref),
-        //     required: isRequired(element),
-        //     choice: scope?.choice,
-        //     reference: String(element.attributes.ref),
-        // });
         parent.props.push(createReferenceProp(element, scope));
     } else {
         // element.attributes.name is necessarily present
@@ -353,8 +333,8 @@ const element = (
             field.type = cleanType(String(element.attributes?.type));
         }
 
-        element.elements?.forEach((e) =>
-            processType(type(e), e, field, scope, declarations)
+        element.elements?.forEach(e =>
+            processType(type(e), e, field, scope, declarations),
         );
 
         if (field.props.length) {
@@ -362,35 +342,27 @@ const element = (
             parent.props.push(asReferenceProp(field));
             declarations.set(field.name, asInterface(field));
         } else {
-            // const { name, required, choice, type, values } = field;
             parent.props.push(asProp(field));
         }
     }
-};
-
-const definitions = (root: Interface) => {
-    root.props?.forEach((f) => {
-        f.required = false;
-    });
 };
 
 const schema = (
     element: Element,
     parent?: Interface,
     scope?: Scope,
-    declarations?: Map<string, Interface>
+    declarations?: Map<string, Interface>,
 ) => {
     const _interface: Interface = {
-        name: "schema",
+        name: 'schema',
         props: [],
     };
 
     declarations?.set(_interface.name, _interface);
 
-    element.elements?.forEach((e) =>
-        processType(type(e), e, _interface, scope, declarations)
+    element.elements?.forEach(e =>
+        processType(type(e), e, _interface, scope, declarations),
     );
-    // definitions(_schema);
 
     return _interface;
 };
@@ -400,7 +372,7 @@ const processType = (
     _element: Element,
     parent: Interface | Prop,
     scope?: Scope,
-    declarations?: Map<string, Interface>
+    declarations?: Map<string, Interface>,
 ): Prop | void => {
     const processors = {
         schema,
@@ -423,7 +395,7 @@ const processType = (
 };
 
 const toObject = (
-    declarations: Map<string, Interface>
+    declarations: Map<string, Interface>,
 ): Record<string, Interface> => {
     const obj: Record<string, Interface> = {};
 
@@ -435,21 +407,21 @@ const toObject = (
 };
 
 const makeSchemaElementsNotRequired = (
-    interfaces: Record<string, Interface>
+    interfaces: Record<string, Interface>,
 ): Record<string, Interface> => {
-    interfaces["schema"].props = interfaces["schema"].props.map((p) => ({
+    interfaces['schema'].props = interfaces['schema'].props.map(p => ({
         ...p,
         required: false,
     }));
     return interfaces;
 };
 
-export default (xsdFilePath: string) => {
-    const xsd = readFileSync(xsdFilePath, "utf8");
+export default (xsdFilePath: string): Record<string, Interface> => {
+    const xsd = readFileSync(xsdFilePath, 'utf8');
     const options = { ignoreComment: true, alwaysChildren: true, trim: true };
     const root = <Element>xml2js(xsd, { ...options, compact: false });
 
-    const schema = root.elements?.find((e) => e.name === "xsd:schema");
+    const schema = root.elements?.find(e => e.name === 'xsd:schema');
 
     if (!schema) {
         throw new SchemaNotFoundError(root);
@@ -462,8 +434,6 @@ export default (xsdFilePath: string) => {
     const interfaces = toObject(declarations);
 
     makeSchemaElementsNotRequired(interfaces);
-
-    writeFileSync("interfaces.json", JSON.stringify(interfaces));
 
     return interfaces;
 };
