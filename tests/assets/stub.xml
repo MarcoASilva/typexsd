@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<openimmo>
+  <uebertragung art="ONLINE" umfang="TEIL" version="1.0" sendersoftware="my-software" senderversion="v1"/>
+  <anbieter>
+    <firma>Joe LLC</firma>
+    <openimmo_anid>UH321890UA9</openimmo_anid>
+    <immobilie>
+      <kontaktperson>
+        <email_zentrale>test@test.test</email_zentrale>
+        <name>Testson</name>
+        <email_sonstige emailart="EM_PRIVAT" bemerkung="test">test2@test.test</email_sonstige>
+      </kontaktperson>
+      <preise>
+        <hauptmietzinsnetto hauptmietzinsust="123">777</hauptmietzinsnetto>
+      </preise>
+    </immobilie>
+  </anbieter>
+</openimmo>

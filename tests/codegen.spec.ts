@@ -8,7 +8,7 @@ import { readFileSync } from 'fs';
 const xsdFilePath = join(__dirname, 'assets', 'openimmo_127b.xsd');
 const stubInterfaces = readFileSync(join(__dirname, 'stubs', 'interfaces.ts'));
 
-describe('Generate command', () => {
+describe('codegen', () => {
     it('yeld same interfaces description json given the same xsd', () => {
         const interfaces = extractFields(xsdFilePath);
 
