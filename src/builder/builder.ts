@@ -11,19 +11,38 @@ export interface Target {
 
 export type Builder = <T extends keyof U, U>(data: U, elementName: T) => string;
 
-const loadExtensions = (
+export const loadExtensions = (
     intrfc: Interface,
     interfaces: Record<string, Interface>,
 ): Interface => {
     if (!intrfc.extend) return intrfc;
-    const base: Interface | Prop | undefined =
-        interfaces[intrfc.extend] ??
-        interfaces['schema'].props.find(({ name }) => name === intrfc.extend);
-    if (!base) {
-        throw new Error(`Could not find type ${intrfc.extend} to extend.`);
+
+    let extended: Interface & Partial<Prop>;
+
+    if (isPrimitive(intrfc.extend)) {
+        // e.g hauptmietzinsnetto extends decimal
+        extended = { ...intrfc, type: intrfc.extend };
+    } else {
+        // e.g email_sonstige extends Kontakt
+        const base: Interface | Prop | undefined =
+            interfaces[intrfc.extend] ??
+            interfaces['schema'].props.find(
+                ({ name }) => name === intrfc.extend,
+            );
+
+        if (!base) {
+            throw new Error(`Could not find type ${intrfc.extend} to extend.`);
+        }
+
+        extended = {
+            ...base,
+            ...intrfc,
+            props: intrfc.props.concat(base.props ?? []),
+        };
     }
-    const extended: Interface | Prop = { ...base, ...intrfc };
+
     if (isPrimitive((extended as unknown as Prop).type!)) {
+        // #002 element has children an a value atst
         extended.props.push({
             name: intrfc.name,
             required: true,
@@ -65,12 +84,19 @@ const populateProp = (
     parentData: any,
     interfaces: Record<string, Interface>,
 ) => {
-    const data = parentData[prop.name];
+    const data = parentData?.[prop.name];
 
     if (isNil(data)) return;
 
     if (prop.isAttr) {
-        return parent.att(prop.name, data);
+        parent.att(prop.name, data);
+        return;
+    }
+
+    if (prop.name === parent.name) {
+        // #002
+        parent.text(data);
+        return;
     }
 
     const element = parent.ele(prop.name);
@@ -83,14 +109,18 @@ const populateProp = (
     if (Array.isArray(type)) throw new Error('Wtf?? Should this happen?');
 
     if (isPrimitive(type)) {
-        return element.text(data);
+        element.text(data);
+        return;
     }
 
     if (interfaces[type]) {
         populateInterface(element, interfaces[type], parentData, interfaces);
+        return;
     }
 
-    return element;
+    console.warn(
+        `Could not populate prop: ${prop.name} in parent: ${parent.name}`,
+    );
 };
 
 const populateInterface = (
