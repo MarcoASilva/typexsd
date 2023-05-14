@@ -1,7 +1,11 @@
+import { readFileSync, writeFileSync } from 'fs';
 import { isNil } from 'lodash';
+import { join } from 'path';
+import { inspect } from 'util';
 import { ElementCompact, xml2js } from 'xml-js';
+import { loadExtensions } from '../builder/builder';
 import { isPrimitive, resolveType } from '../codegen/build-interfaces';
-import { Interface } from '../codegen/extract-fields';
+import extractFields, { Interface, Prop } from '../codegen/extract-fields';
 
 interface PrimitivesParser {
     parsePrimitives(): Record<string, any>;
@@ -83,12 +87,34 @@ const schemaCompliantPrimitivesParser = (
     const findType = (path: string) => {
         const [interfaceName, ...rest] = path.split('.');
 
-        let currentDefinition: Interface = interfaces[interfaceName];
+        let currentDefinition: Interface = loadExtensions(
+            interfaces[interfaceName],
+            interfaces,
+        );
 
-        for (const part of rest) {
+        for (const [i, part] of Object.entries(rest)) {
             const p = currentDefinition.props.find(p => p.name === part);
 
-            if (!p) throw new Error(`Property not found ${path}`);
+            if (!p) {
+                if (part === rest[+i - 1]) {
+                    // prop is  an exception caused by #002 (like openimmo.anbieter.immobilie.kontaktperson.email_sonstige.email_sonstig)
+                    console.log(path, currentDefinition);
+
+                    if (!currentDefinition.extend)
+                        return currentDefinition.name;
+
+                    const type = resolveType(
+                        currentDefinition.extend!,
+                        interfaces,
+                    );
+
+                    if (Array.isArray(type)) return 'string';
+                    if (isPrimitive(type)) return JSPrimitiveType(type);
+                    return type;
+                }
+                console.error(currentDefinition);
+                throw new Error(`Property not found ${path}`);
+            }
 
             const type = resolveType((p.type || p.reference)!, interfaces);
 
@@ -97,7 +123,7 @@ const schemaCompliantPrimitivesParser = (
 
             if (isPrimitive(type)) return JSPrimitiveType(type);
 
-            currentDefinition = interfaces[type];
+            currentDefinition = loadExtensions(interfaces[type], interfaces);
         }
 
         return currentDefinition.name;
