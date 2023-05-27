@@ -1,7 +1,7 @@
 {
     "name": "typexml",
-    "version": "0.2.1",
-    "description": "Type-safe xml builder base in xsd for Typescript environments",
+    "version": "0.2.2-beta.0",
+    "description": "Type-safe xml paser and builder based in xsd for Typescript environments",
     "main": "build/index.js",
     "bin": "build/index.js",
     "files": [
