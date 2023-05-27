@@ -98,7 +98,6 @@ const schemaCompliantPrimitivesParser = (
             if (!p) {
                 if (part === rest[+i - 1]) {
                     // prop is  an exception caused by #002 (like openimmo.anbieter.immobilie.kontaktperson.email_sonstige.email_sonstig)
-                    console.log(path, currentDefinition);
 
                     if (!currentDefinition.extend)
                         return currentDefinition.name;
@@ -116,6 +115,7 @@ const schemaCompliantPrimitivesParser = (
                 throw new Error(`Property not found ${path}`);
             }
 
+            // [wip]: if a given field does not have anything in the schema, e.g user_defined_anyfield, maybe it should try to parse it into Javascript rather then ignoring because it's not in schema def.
             const type = resolveType((p.type || p.reference)!, interfaces);
 
             // bad... assuming string but could be number also
@@ -132,6 +132,10 @@ const schemaCompliantPrimitivesParser = (
     const parseVal = (path: string, val: string): boolean | number | string => {
         const type = findType(path);
 
+        if (path.includes('fieldvalue')) {
+            // console.log(path, type);
+            // [wip] if field is "any" or child of an "any" field then it should try to parse...
+        }
         if (type === 'number' || type === 'boolean') {
             try {
                 return JSON.parse(val);

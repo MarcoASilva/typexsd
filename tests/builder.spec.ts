@@ -2,7 +2,7 @@ import { join } from 'path';
 import assert from 'assert';
 import { readFileSync } from 'fs';
 import { createBuilder } from '../src/builder/builder';
-import { schema } from './stubs/data';
+import { stubXmlObject } from './stubs/data';
 
 const xsdFilePath = join(__dirname, 'assets', 'openimmo_127b.xsd');
 
@@ -14,7 +14,7 @@ describe('builder', () => {
         const build = createBuilder({
             xsdFilePath,
         });
-        const xml = build(schema, 'openimmo');
+        const xml = build(stubXmlObject, 'openimmo');
 
         assert.equal(xml, stubBuiltXml);
     });

@@ -1,6 +1,6 @@
 import { Immobilie, Schema } from './interfaces';
 
-export const schema: Schema = {
+export const stubXmlObject: Schema = {
     openimmo: {
         uebertragung: {
             art: 'ONLINE',
