@@ -1,6 +1,6 @@
 # typexml
 
-Type-safe xml builder base in xsd for Typescript environments
+Type-safe xml parser and builder based in xsd for Typescript environments
 
 ### Install
 
@@ -20,48 +20,42 @@ schema. It can be imported anywhere you want to generate a compliant XML.
 
 ### usage
 
+Let's say you want to generated the element "**foo**" defined in your XSD file
+
 ```typescript
 import { createBuilder } from 'typemxml';
 import { Schema } from '/path/to/interfaces.ts';
 
-const openImmo: Schema = {
-    openimmo: {
-        anbieter: {
-            firma: 'Joe LLC',
-            openimmo_anid: '09sa0d9ad90',
-        },
-        uebertragung: {
-            art: 'ONLINE',
-            sendersoftware: 'some-software',
-            senderversion: 'v1.0.1',
-            umfang: 'VOLL',
-            version: 'v1',
-        },
+const schema: Schema = {
+    foo: {
+        // fill in foo props with type safety...
+        ...props,
     },
 };
 
-const build = createBuilder({ xsdFilePath: 'openimmo_127b.xsd' });
+const build = createBuilder({ xsdFilePath: 'path-to-xsd-file.xsd' });
 
-const xml = build(schema, 'openimmo');
+const xml: string = build(schema, 'foo');
 
-writeFileSync('openimmo.xml', xml);
+writeFileSync('foo.xml', xml);
 ```
 
 ### validation
 
-You can validate the xml with the help of `xsd-validator` package
+You can validate the XML with the help of
+[`xsd-validator`](https://www.npmjs.com/package/xsd-validator) package
+(`npm i xsd-validator`) (or any other library of your choice...)
 
 ```typescript
 import { validate } from 'typexml';
-import validateSchema, { ValidationError } from 'xsd-validator';
+import validateSchema, { ValidationError } from 'xsd-schema-validator';
 
-try {
-    validateSchema(schema, xml);
-} catch (error) {
-    if (error instanceof ValidationError) {
-        console.error((error as ValidationError).errors, 'validation errors');
-        return xml;
-    }
-    throw e;
+const xsd = readFileSync('path-to-xsd-file.xsd').toString();
+
+const errors: true | ValidationError[] = validateSchema(xml, xsd);
+
+if (errors instanceof Array) {
+    errors.forEach(e => console.error(e));
+    throw new Error('Invalid XML');
 }
 ```
