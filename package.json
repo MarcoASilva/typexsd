@@ -1,6 +1,6 @@
 {
-    "name": "typexml",
-    "version": "0.3.1-beta.0",
+    "name": "typexsd",
+    "version": "0.3.2-beta.0",
     "description": "Type-safe xml paser and builder based in xsd for Typescript environments",
     "main": "build/index.js",
     "bin": "build/index.js",
@@ -13,10 +13,14 @@
         "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
     },
     "keywords": [
-        "xsd",
+        "typed",
         "xml",
-        "interfaces",
         "builder",
+        "parser",
+        "xsd",
+        "interfaces",
+        "type",
+        "types",
         "typescript",
         "converter"
     ],

@@ -1,17 +1,17 @@
-# typexml
+# typexsd
 
-Type-safe xml parser and builder based in XSD file for Typescript environments
+Type-safe XML parser and builder based in XSD file for Typescript environments
 
 ### installation
 
-`npm i typexml` or `yard add typexml`
+`npm i typexsd` or `yard add typexsd`
 
 ### codegen
 
-In your project, after installing `typexml`, run the following to generate types
+In your project, after installing `typexsd`, run the following to generate types
 for your XSD:
 
-`npx typexml generate ${path-to-xsd-file.xsd}`
+`npx typexsd generate ${path-to-xsd-file.xsd}`
 
 This should generate `interfaces.ts`.
 
@@ -25,7 +25,7 @@ schema. It can be imported anywhere you want to generate a compliant XML.
 Let's say you want to generate the element "**foo**" defined in your XSD file
 
 ```typescript
-import { createBuilder } from 'typemxml';
+import { createBuilder } from 'typexsd';
 import { Schema } from '/path/to/interfaces.ts';
 
 const schema: Schema = {
@@ -71,7 +71,7 @@ It also comes with a parser in case you need
 
 ```typescript
 import { readFileSync } from 'fs';
-import { createParser } from 'typemxml';
+import { createParser } from 'typexsd';
 import { Foo } from '/path/to/interfaces.ts';
 
 const xml = readFileSync('path-to-xml-file.xml').toString();
@@ -88,7 +88,7 @@ console.log(foo.bar.length);
 
 ```typescript
 import { readFileSync } from 'fs';
-import { createParser } from 'typemxml';
+import { createParser } from 'typexsd';
 
 const xml = readFileSync('path-to-xml-file.xml').toString();
 
