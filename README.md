@@ -2,25 +2,22 @@
 
 Type-safe XML parser and builder based in XSD file for Typescript environments
 
-### installation
+## installation
 
 `npm i typexsd` or `yard add typexsd`
 
-### codegen
-
-In your project, after installing `typexsd`, run the following to generate types
-for your XSD:
+## codegen
 
 `npx typexsd generate ${path-to-xsd-file.xsd}`
 
-This should generate `interfaces.ts`.
+This should generate types from your XSD in `interfaces.ts`.
 
 `interfaces.ts` holds the collection of types extracted from the provided XSD
 schema. It can be imported anywhere you want to generate a compliant XML.
 
-### usage
+## usage
 
-#### build
+### build
 
 Let's say you want to generate the element "**foo**" defined in your XSD file
 
@@ -43,7 +40,7 @@ const xml: string = build(schema, 'foo');
 writeFileSync('foo.xml', xml);
 ```
 
-#### validation
+### validation
 
 You can validate the XML with the help of
 [`xsd-validator`](https://www.npmjs.com/package/xsd-validator) package
@@ -63,7 +60,7 @@ if (errors instanceof Array) {
 }
 ```
 
-#### parse
+### parse
 
 It also comes with a parser in case you need
 
