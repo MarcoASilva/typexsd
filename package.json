@@ -1,9 +1,10 @@
 {
     "name": "typexsd",
-    "version": "0.3.2-beta.0",
+    "version": "0.3.3-beta.0",
     "description": "Type-safe xml paser and builder based in xsd for Typescript environments",
     "main": "build/index.js",
     "bin": "build/index.js",
+    "readme": "README.MD",
     "files": [
         "build"
     ],
