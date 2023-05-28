@@ -2,7 +2,7 @@
 
 Type-safe xml parser and builder based in xsd for Typescript environments
 
-### Install
+### installation
 
 `npm i typexml` or `yard add typexml`
 
@@ -20,7 +20,9 @@ schema. It can be imported anywhere you want to generate a compliant XML.
 
 ### usage
 
-Let's say you want to generated the element "**foo**" defined in your XSD file
+#### build
+
+Let's say you want to generate the element "**foo**" defined in your XSD file
 
 ```typescript
 import { createBuilder } from 'typemxml';
@@ -49,7 +51,6 @@ You can validate the XML with the help of
 
 ```typescript
 import { readFileSync } from 'fs';
-import { validate } from 'typexml';
 import validateSchema, { ValidationError } from 'xsd-schema-validator';
 
 const xsd = readFileSync('path-to-xsd-file.xsd').toString();
@@ -62,13 +63,15 @@ if (errors instanceof Array) {
 }
 ```
 
+#### parse
+
 It also comes with a parser in case you need
 
 -   With XSD/interface compliant parsing:
 
 ```typescript
 import { readFileSync } from 'fs';
-import { createBuilder } from 'typemxml';
+import { createParser } from 'typemxml';
 import { Foo } from '/path/to/interfaces.ts';
 
 const xml = readFileSync('path-to-xml-file.xml').toString();
@@ -85,8 +88,7 @@ console.log(foo.bar.length);
 
 ```typescript
 import { readFileSync } from 'fs';
-import { createBuilder } from 'typemxml';
-import { Foo } from '/path/to/interfaces.ts';
+import { createParser } from 'typemxml';
 
 const xml = readFileSync('path-to-xml-file.xml').toString();
 
