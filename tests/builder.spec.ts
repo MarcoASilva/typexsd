@@ -11,9 +11,7 @@ const stubBuiltXml = readFileSync(xmlFilePath).toString();
 
 describe('builder', () => {
     it('yeld same xml givem same data', () => {
-        const build = createBuilder({
-            xsdFilePath,
-        });
+        const build = createBuilder(xsdFilePath);
         const xml = build(stubXmlObject, 'openimmo');
 
         assert.equal(xml, stubBuiltXml);

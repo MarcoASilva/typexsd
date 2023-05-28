@@ -196,3 +196,19 @@ export const parse = <T = Record<string, any>>(
 
     return defaultPrimitiveParser(parsed).parsePrimitives() as T;
 };
+
+type Parse<T = Record<string, any>> = (xml: string) => T;
+
+export const createParser = <T = Record<string, any>>(
+    xsdFilePath?: string,
+): Parse<T> => {
+    const parser = (xml: string) => {
+        if (xsdFilePath) {
+            const fields = extractFields(xsdFilePath);
+            return parse(xml, fields) as T;
+        }
+        return parse(xml) as T;
+    };
+
+    return parser;
+};

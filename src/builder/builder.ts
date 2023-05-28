@@ -166,5 +166,5 @@ export const build = <T extends keyof U, U>(
     return root.end({ pretty: true });
 };
 
-export const createBuilder = (target: Target): Builder =>
-    build.bind(build, target) as Builder;
+export const createBuilder = (xsdFilePath: string): Builder =>
+    build.bind(build, { xsdFilePath: xsdFilePath }) as Builder;
