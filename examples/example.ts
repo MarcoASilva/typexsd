@@ -1,6 +1,8 @@
 import { writeFileSync } from 'fs';
 import { createBuilder } from '../src';
-import { Schema } from './interfaces';
+import { Openimmo, Schema } from './interfaces';
+import { createParser } from '../src/parser/parser';
+import { deepEqual } from 'assert';
 
 const schema: Schema = {
     openimmo: {
@@ -18,8 +20,15 @@ const schema: Schema = {
     },
 };
 
-const build = createBuilder({ xsdFilePath: 'openimmo_127b.xsd' });
+const xsdFilePath = './openimmo_127b.xsd';
+
+const build = createBuilder(xsdFilePath);
+const parse = createParser<Openimmo>(xsdFilePath);
 
 const xml = build(schema, 'openimmo');
+
+const openimmo = parse(xml);
+
+deepEqual(schema.openimmo, openimmo);
 
 writeFileSync('output.xml', xml);
