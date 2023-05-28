@@ -1,6 +1,6 @@
 # typexml
 
-Type-safe xml parser and builder based in xsd for Typescript environments
+Type-safe xml parser and builder based in XSD file for Typescript environments
 
 ### installation
 
@@ -15,7 +15,7 @@ for your XSD:
 
 This should generate `interfaces.ts`.
 
-`interfaces.ts` holds the collection of types extracted from the provided xsd
+`interfaces.ts` holds the collection of types extracted from the provided XSD
 schema. It can be imported anywhere you want to generate a compliant XML.
 
 ### usage
@@ -30,8 +30,8 @@ import { Schema } from '/path/to/interfaces.ts';
 
 const schema: Schema = {
     foo: {
-        bar: 'bar'
         // fill in foo props with type safety...
+        bar: 'bar'
         ...props,
     },
 };
