@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE crossway-bible SYSTEM "schema/crossway.bibles.dtd">
+<crossway-bible translation="Test Version" revision="2006-10-26"
+    xmlns="http://www.crosswaybibles.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="schema/crossway.bibles.xsd">
+    <book title="Jude" num="65">
+        <marker class="begin-verse" mid="v65001001" />
+        <chapter num="1">
+            <verse num="6">And <crossref let="p" cid="c65001006.1" />foo bar</verse>
+        </chapter>
+    </book>
+</crossway-bible>

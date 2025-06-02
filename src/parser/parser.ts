@@ -176,10 +176,18 @@ export const parse = <T = Record<string, any>>(
         nativeType: true,
     });
 
-    if (Object.keys(root).length > 1)
+    const reservedRootKeys = ['_doctype'];
+
+    const rootEntries = Object.entries(root).filter(
+        ([name]) => !reservedRootKeys.includes(name),
+    );
+
+    console.log(root, rootEntries);
+
+    if (rootEntries.length > 1)
         throw new Error('XML with multiple root elements not supported');
 
-    const [[name]] = Object.entries(root);
+    const [[name]] = rootEntries;
 
     const parsed = conform(
         (root as Record<string, ElementCompact>)[name],

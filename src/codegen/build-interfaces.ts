@@ -26,6 +26,7 @@ export const isPrimitive = (type: string) =>
         'QName',
         'NOTATION',
         'positiveInteger',
+        'integer',
         'any',
     ].includes(type);
 
@@ -126,6 +127,10 @@ const mapToTypeNode = (xsdType: string): ts.TypeNode => {
             return ts.factory.createKeywordTypeNode(
                 ts.SyntaxKind.NumberKeyword,
             );
+        case 'integer':
+            return ts.factory.createKeywordTypeNode(
+                ts.SyntaxKind.NumberKeyword,
+            );
         case 'base64Binary':
             return ts.factory.createTypeReferenceNode('Buffer');
         default:
@@ -136,7 +141,7 @@ const mapToTypeNode = (xsdType: string): ts.TypeNode => {
 const buildInterfaces = (interfaces: Record<string, Interface>): string => {
     const declarations = Object.entries(interfaces)
         .map(([name, _interface]) => {
-            const variations =
+            let variations =
                 Number(
                     max(
                         _interface.props
@@ -144,6 +149,9 @@ const buildInterfaces = (interfaces: Record<string, Interface>): string => {
                             .map(prop => prop.choice! + 1),
                     ),
                 ) || 0 + 1;
+            if (_interface.props.some(prop => prop.choiceGroupOptional)) {
+                variations += 1; // add one for the case where choice props are not present
+            }
             return range(0, variations).map(variation => {
                 const propSignatures = _interface.props
                     .map(prop => {
