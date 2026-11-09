@@ -1,0 +1,10 @@
+node_modules
+build
+local
+tests/stubs/*.interfaces.ts
+tests/stubs/*.json
+examples/interfaces.ts
+examples/output.xml
+tests/assets
+issue_schemas
+package-lock.json

@@ -1,8 +1,8 @@
+import { deepStrictEqual } from 'assert';
 import { writeFileSync } from 'fs';
-import { createBuilder } from '../src';
-import { Openimmo, Schema } from './interfaces';
-import { createParser } from '../src/parser/parser';
-import { deepEqual } from 'assert';
+import { join } from 'path';
+import { createBuilder, createParser, loadSchemaSync } from '../src';
+import type { Openimmo, Schema } from './new-interfaces';
 
 const schema: Schema = {
     openimmo: {
@@ -13,22 +13,25 @@ const schema: Schema = {
             umfang: 'TEIL',
             version: '1.0',
         },
-        anbieter: {
-            firma: 'Joe LLC',
-            openimmo_anid: 'UH321890UA9',
-        },
+        anbieter: [
+            {
+                firma: 'Joe LLC',
+                openimmo_anid: 'UH321890UA9',
+            },
+        ],
     },
 };
 
-const xsdFilePath = './openimmo_127b.xsd';
+// compile the XSD once; the builder and the parser share it
+const compiled = loadSchemaSync(join(__dirname, 'openimmo_127b.xsd'));
 
-const build = createBuilder(xsdFilePath);
-const parse = createParser<Openimmo>(xsdFilePath);
+const build = createBuilder(compiled);
+const parse = createParser<Openimmo>(compiled);
 
 const xml = build(schema, 'openimmo');
 
 const openimmo = parse(xml);
 
-deepEqual(schema.openimmo, openimmo);
+deepStrictEqual(schema.openimmo, openimmo);
 
-writeFileSync('output.xml', xml);
+writeFileSync(join(__dirname, 'output.xml'), xml);

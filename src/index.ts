@@ -1,13 +1,15 @@
-#!/usr/bin/env node
-
-import extractFields from './codegen/extract-fields';
-import buildInterfaces from './codegen/build-interfaces';
-import { writeFileSync } from 'fs';
-
-export * from './builder/builder';
-export * from './parser/parser';
-
-if (process.argv.some(arg => arg === 'generate')) {
-    const xsdFilePath = process.argv[process.argv.indexOf('generate') + 1];
-    writeFileSync('interfaces.ts', buildInterfaces(extractFields(xsdFilePath)));
-}
+export { loadSchema, loadSchemaSync, compileXsd } from './schema';
+export type { SchemaOptions } from './schema';
+export { generateTypes, generateDeclarations } from './codegen';
+export type { GenerateOptions } from './codegen';
+export { createBuilder, build } from './runtime/builder';
+export type { Builder, BuilderOptions, Target } from './runtime/builder';
+export { createParser, parse } from './runtime/parser';
+export type { Parse, ParserOptions } from './runtime/parser';
+export type { LoadOptions } from './xsd/loader';
+export type { CompileOptions } from './xsd/compile';
+export { DiagnosticBag, XsdError, formatDiagnostic } from './xsd/diagnostics';
+export type { Diagnostic } from './xsd/diagnostics';
+export type * from './xsd/model';
+export { getContentView } from './xsd/view';
+export type { ContentView } from './xsd/view';

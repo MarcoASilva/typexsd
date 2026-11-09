@@ -1,0 +1,4 @@
+1. support arrays (maxOccurs="unbounded")
+2. support optional variations (choice minOccurs="unbounded")
+3. support inheriting maxOccurs="unbounded" (choice, group, sequence)
+4. support inner choices
