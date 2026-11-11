@@ -33,7 +33,9 @@ import {
     objectType,
     ref,
     union,
+    withConstraints,
 } from './ir';
+import { constraintsOf, nonEmptyConstraints } from './constraints';
 import { facetTags, makeDoc } from './docs';
 import { NameRegistry } from './naming';
 
@@ -54,6 +56,11 @@ export interface GenerateOptions {
     rootName?: string;
     /** First line(s) of the generated file; `false` for none. */
     header?: string | false;
+    /**
+     * When generating Zod schemas, encode XSD facets and occurrence bounds as
+     * Zod checks. Ignored by the TypeScript printer.
+     */
+    encodeFacets?: boolean;
 }
 
 export const DEFAULT_HEADER =
@@ -205,12 +212,16 @@ export class TypeGenerator {
     }
 
     private simpleBody(t: SimpleTypeDef): TsType {
-        if (t.variety === 'list') return arrayOf(this.simple(t.itemType!));
-        if (t.variety === 'union')
-            return union((t.memberTypes ?? []).map(m => this.simple(m)));
-        if (t.facets.enumeration?.length && !t.builtin)
-            return union(this.enumerationLiterals(t));
-        return this.builtinTs(t);
+        let body: TsType;
+        if (t.variety === 'list') body = arrayOf(this.simple(t.itemType!));
+        else if (t.variety === 'union')
+            body = union((t.memberTypes ?? []).map(m => this.simple(m)));
+        else if (t.facets.enumeration?.length && !t.builtin)
+            body = union(this.enumerationLiterals(t));
+        else body = this.builtinTs(t);
+        // Enumerations are already exact literals; other facets ride along for Zod.
+        if (t.facets.enumeration?.length && !t.builtin) return body;
+        return withConstraints(body, nonEmptyConstraints(constraintsOf(t)));
     }
 
     /** TypeScript type for a simple type. Named, non-built-in types become aliases. */
@@ -493,7 +504,16 @@ export class TypeGenerator {
 
     private slotMember(slot: Slot, parentName: string): TsMember {
         let type = this.elementType(slot.decl, parentName);
-        if (slot.array) type = arrayOf(type);
+        if (slot.array) {
+            type = arrayOf(type);
+            const items: {
+                minItems?: number;
+                maxItems?: number;
+            } = {};
+            if (slot.min > 0) items.minItems = slot.min;
+            if (Number.isFinite(slot.max)) items.maxItems = slot.max;
+            type = withConstraints(type, nonEmptyConstraints(items));
+        }
         const bounds: string[] = [];
         if (slot.array && slot.min > 1) bounds.push(`@minItems ${slot.min}`);
         if (slot.array && Number.isFinite(slot.max))

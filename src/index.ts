@@ -1,7 +1,12 @@
 export { loadSchema, loadSchemaSync, compileXsd } from './schema';
 export type { SchemaOptions } from './schema';
-export { generateTypes, generateDeclarations } from './codegen';
-export type { GenerateOptions } from './codegen';
+export {
+    generateTypes,
+    generateZod,
+    generateDeclarations,
+    printZodDeclarations,
+} from './codegen';
+export type { GenerateOptions, PrintZodOptions } from './codegen';
 export { createBuilder, build } from './runtime/builder';
 export type { Builder, BuilderOptions, Target } from './runtime/builder';
 export { createParser, parse } from './runtime/parser';

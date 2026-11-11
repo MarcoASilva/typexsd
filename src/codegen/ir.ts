@@ -1,10 +1,26 @@
 /**
  * Small intermediate representation of the TypeScript we generate. The
- * mapping rules build this; `print.ts` turns it into source text. Keeping the
- * two apart makes the mapping testable without going through a printer.
+ * mapping rules build this; `print.ts` turns it into source text and
+ * `print-zod.ts` into Zod schemas. Keeping the mapping apart from the
+ * printers makes it testable without going through either.
  */
 
-export type TsType =
+/** Facets / occurrence bounds the Zod printer can encode when asked to. */
+export interface TypeConstraints {
+    length?: number;
+    minLength?: number;
+    maxLength?: number;
+    minInclusive?: number;
+    maxInclusive?: number;
+    minExclusive?: number;
+    maxExclusive?: number;
+    /** Each step is an OR-group; a value must match every step (XSD rule). */
+    patterns?: string[][];
+    minItems?: number;
+    maxItems?: number;
+}
+
+type TsTypeBase =
     | {
           k: 'keyword';
           name: 'string' | 'number' | 'boolean' | 'unknown' | 'never';
@@ -16,6 +32,8 @@ export type TsType =
     | { k: 'union'; types: TsType[] }
     | { k: 'intersection'; types: TsType[] }
     | { k: 'object'; members: TsMember[]; index?: TsType };
+
+export type TsType = TsTypeBase & { constraints?: TypeConstraints };
 
 export interface TsDoc {
     /** Free text, one entry per paragraph. */
@@ -93,3 +111,30 @@ export const objectType = (members: TsMember[], index?: TsType): TsType => ({
 
 export const isEmptyObject = (t: TsType): boolean =>
     t.k === 'object' && t.members.length === 0 && !t.index;
+
+const hasConstraintValues = (c: TypeConstraints): boolean =>
+    Object.values(c).some(
+        v => v !== undefined && !(Array.isArray(v) && !v.length),
+    );
+
+/** Attach (or merge) constraints onto a type node for the Zod facet printer. */
+export const withConstraints = (
+    type: TsType,
+    extra?: TypeConstraints,
+): TsType => {
+    if (!extra || !hasConstraintValues(extra)) return type;
+    const merged: TypeConstraints = { ...type.constraints };
+    for (const [key, value] of Object.entries(extra) as [
+        keyof TypeConstraints,
+        TypeConstraints[keyof TypeConstraints],
+    ][]) {
+        if (value !== undefined)
+            (merged as Record<string, unknown>)[key] = value;
+    }
+    return hasConstraintValues(merged)
+        ? { ...type, constraints: merged }
+        : type;
+};
+
+export const schemaConstName = (typeName: string): string =>
+    `${typeName}Schema`;

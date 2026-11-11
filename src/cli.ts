@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { writeFileSync } from 'fs';
-import { generateTypes } from './codegen';
+import { generateTypes, generateZod } from './codegen';
 import { formatDiagnostic } from './xsd/diagnostics';
 import { loadSchema } from './schema';
 
@@ -12,6 +12,8 @@ Usage:
 
 Options:
   --out <file>            Output file (default: interfaces.ts)
+  --zod <file>            Also write Zod schemas to this file
+  --zod-encode-xsd-facets Encode XSD facets as Zod checks (requires --zod)
   --map <url=path>        Load a remote schemaLocation from a local file (repeatable)
   --local-fallback        For unmapped remote includes, look for the same file name next to the including schema
   --type <xsd=ts>         Override the TypeScript type of a built-in datatype, e.g. --type dateTime=Date (repeatable)
@@ -27,6 +29,8 @@ interface Args {
     command?: string;
     input?: string;
     out: string;
+    zod?: string;
+    encodeFacets: boolean;
     map: Record<string, string>;
     typeMap: Record<string, string>;
     localFallback: boolean;
@@ -41,6 +45,7 @@ interface Args {
 const parseArgs = (argv: string[]): Args => {
     const args: Args = {
         out: 'interfaces.ts',
+        encodeFacets: false,
         map: {},
         typeMap: {},
         localFallback: false,
@@ -66,6 +71,12 @@ const parseArgs = (argv: string[]): Args => {
         switch (arg) {
             case '--out':
                 args.out = value(i++, arg);
+                break;
+            case '--zod':
+                args.zod = value(i++, arg);
+                break;
+            case '--zod-encode-xsd-facets':
+                args.encodeFacets = true;
                 break;
             case '--map': {
                 const [k, v] = pair(value(i++, arg), arg);
@@ -136,6 +147,11 @@ export const run = async (
         io.error(USAGE);
         return 2;
     }
+    if (args.encodeFacets && !args.zod) {
+        io.error('--zod-encode-xsd-facets requires --zod <file>');
+        io.error(USAGE);
+        return 2;
+    }
 
     const schema = await loadSchema(args.input, {
         urlMap: args.map,
@@ -147,14 +163,23 @@ export const run = async (
         for (const d of schema.diagnostics)
             if (d.severity !== 'info') io.error(formatDiagnostic(d));
 
-    const source = generateTypes(schema, {
+    const options = {
         docs: args.docs,
         docLang: args.docLang,
         typeMap: args.typeMap,
         rootName: args.root,
-    });
+        encodeFacets: args.encodeFacets,
+    };
+
+    const source = generateTypes(schema, options);
     writeFileSync(args.out, source);
     if (!args.quiet) io.error(`Wrote ${args.out}`);
+
+    if (args.zod) {
+        const zodSource = generateZod(schema, options);
+        writeFileSync(args.zod, zodSource);
+        if (!args.quiet) io.error(`Wrote ${args.zod}`);
+    }
     return 0;
 };
 

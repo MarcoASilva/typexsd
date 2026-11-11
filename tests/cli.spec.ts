@@ -101,8 +101,49 @@ describe('cli', () => {
         expect(lenient.err).toContain('unresolved-reference');
     });
 
+    it('writes Zod schemas with --zod and encodes facets on request', async () => {
+        const dir = mkdtempSync(join(tmpdir(), 'typexsd-cli-'));
+        const xsd = join(dir, 's.xsd');
+        const out = join(dir, 'types.ts');
+        const zodOut = join(dir, 'schemas.ts');
+        writeFileSync(
+            xsd,
+            `<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+               <xs:simpleType name="code"><xs:restriction base="xs:string"><xs:minLength value="2"/></xs:restriction></xs:simpleType>
+               <xs:element name="a" type="code"/>
+             </xs:schema>`,
+        );
+        const missing = await cli(
+            'generate',
+            xsd,
+            '--out',
+            out,
+            '--zod-encode-xsd-facets',
+        );
+        expect(missing.code).toBe(2);
+        expect(missing.err).toContain('requires --zod');
+
+        const result = await cli(
+            'generate',
+            xsd,
+            '--out',
+            out,
+            '--zod',
+            zodOut,
+            '--zod-encode-xsd-facets',
+            '--quiet',
+        );
+        expect(result.code).toBe(0);
+        const schemas = readFileSync(zodOut, 'utf8');
+        expect(schemas).toContain("import { z } from 'zod';");
+        expect(schemas).toContain('CodeSchema');
+        expect(schemas).toContain('.min(2)');
+        expect(readFileSync(out, 'utf8')).toContain('export type Code');
+    });
+
     it('prints usage for help, missing and unknown arguments', async () => {
         expect((await cli('--help')).out).toContain('Usage:');
+        expect((await cli('--help')).out).toContain('--zod');
         expect((await cli()).code).toBe(2);
         expect((await cli('generate')).code).toBe(2);
         const unknown = await cli('generate', 'x.xsd', '--bogus');

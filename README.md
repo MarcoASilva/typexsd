@@ -29,6 +29,8 @@ or element it came from.
 typexsd generate <schema.xsd> [options]
 
   --out <file>            Output file (default: interfaces.ts)
+  --zod <file>            Also write Zod schemas to this file
+  --zod-encode-xsd-facets Encode XSD facets as Zod checks (requires --zod)
   --map <url=path>        Load a remote schemaLocation from a local file (repeatable)
   --local-fallback        For unmapped remote includes, look for the same file name next to the including schema
   --type <xsd=ts>         Override the TypeScript type of a built-in datatype, e.g. --type dateTime=Date
@@ -43,11 +45,18 @@ The same thing from code:
 
 ```typescript
 import { writeFileSync } from 'fs';
-import { generateTypes, loadSchema } from 'typexsd';
+import { generateTypes, generateZod, loadSchema } from 'typexsd';
 
 const schema = await loadSchema('path/to/schema.xsd'); // fetches http(s) includes
 writeFileSync('interfaces.ts', generateTypes(schema, { docs: true }));
+writeFileSync('schemas.ts', generateZod(schema)); // optional; peer-depends on zod
 ```
+
+Pass `--zod schemas.ts` to emit a second file whose exports (`FooSchema`, …)
+are structural twins of the generated interfaces. Add
+`--zod-encode-xsd-facets` to also encode length/pattern/numeric bounds and
+array `minOccurs`/`maxOccurs` as Zod checks (stricter than the TypeScript
+types, which only document those facets in TSDoc).
 
 ### what the types look like
 
