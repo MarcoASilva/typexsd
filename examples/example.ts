@@ -53,4 +53,4 @@ const myOpenImmoXmlParsedBackToJs = parse(myOpenImmoObjToXml);
  */
 deepStrictEqual(myOpenImmoSchemaObj.openimmo, myOpenImmoXmlParsedBackToJs);
 
-writeFileSync(join(__dirname, 'my-open-immo-obj-to-xml.xml'), myOpenImmoObjToXml);
+writeFileSync(join(__dirname, 'my-open-immo.xml'), myOpenImmoObjToXml);
