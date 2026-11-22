@@ -1,8 +1,9 @@
-import { deepStrictEqual } from 'assert';
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { createBuilder, createParser, loadSchemaSync } from '../src';
-import type { Openimmo } from './interfaces';
+import assert, { deepStrictEqual } from "node:assert";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { validateXML } from "xsd-schema-validator";
+import { createBuilder, createParser, loadSchemaSync } from "../src";
+import type { Openimmo } from "./interfaces";
 
 /**
  * This example file performs a sanity check on this lib's xml parser <-> builder
@@ -17,12 +18,12 @@ import type { Openimmo } from './interfaces';
  */
 
 const originalXml = readFileSync(
-    join(__dirname, 'my-open-immo.xml'),
-    'utf8',
+	join(__dirname, "openimmo-full-stub.xml"),
+	"utf8",
 );
 
 // compile the XSD once; the builder and the parser share it
-const compiledXsd = loadSchemaSync(join(__dirname, 'openimmo_127b.xsd'));
+const compiledXsd = loadSchemaSync(join(__dirname, "openimmo_127b.xsd"));
 
 const build = createBuilder(compiledXsd);
 const parse = createParser<Openimmo>(compiledXsd);
@@ -31,14 +32,14 @@ const parse = createParser<Openimmo>(compiledXsd);
 const parsed = parse(originalXml);
 
 // parsed object -> XML again
-const rebuiltXml = build({ openimmo: parsed }, 'openimmo');
+const rebuiltXml = build({ openimmo: parsed }, "openimmo");
 
 /**
  * the original XML should match the one rebuilt from its parsed object
  * otherwise the lib has a parsing/building drift
  */
+// writeFileSync(join(__dirname, "openimmo-full-stub.rebuilt.xml"), rebuiltXml);
 deepStrictEqual(originalXml, rebuiltXml);
 
-writeFileSync(join(__dirname, 'my-open-immo.rebuilt.xml'), rebuiltXml);
-
-console.log('xml -> object -> xml round-trip ok');
+// biome-ignore lint/suspicious/noConsole: <example file>
+console.log("xml -> object -> xml round-trip ok");

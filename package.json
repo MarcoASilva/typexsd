@@ -12,12 +12,16 @@
         "build"
     ],
     "scripts": {
-        "build": "rm -rf build && tsc",
-        "format": "prettier --write .",
-        "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
         "test": "vitest run",
         "test:watch": "vitest",
-        "test:local": "vitest run --config vitest.local.config.mts"
+        "test:local": "vitest run --config vitest.local.config.mts",
+        "build": "rm -rf build && tsc",
+        "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+        "lint": "biome lint .",
+        "format": "biome format --write .",
+        "check": "biome check --write .",
+        "check:ci": "biome ci .",
+        "ci": "npm run typecheck && npm run check:ci"
     },
     "keywords": [
         "typed",
@@ -47,12 +51,14 @@
         }
     },
     "devDependencies": {
+        "@biomejs/biome": "2.6.8",
         "@peker/prettier-config": "^1.1.1",
         "@types/node": "^22.20.5",
         "@types/sax": "^1.2.7",
         "eslint": "^8.17.0",
         "prettier": "^2.6.2",
         "vitest": "^5.1.0",
+        "xsd-schema-validator": "^0.11.0",
         "zod": "^3.25.76"
     },
     "engines": {
