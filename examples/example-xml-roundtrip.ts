@@ -1,5 +1,5 @@
 import assert, { deepStrictEqual } from "node:assert";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateXML } from "xsd-schema-validator";
 import { createBuilder, createParser, loadSchemaSync } from "../src";
@@ -38,8 +38,32 @@ const rebuiltXml = build({ openimmo: parsed }, "openimmo");
  * the original XML should match the one rebuilt from its parsed object
  * otherwise the lib has a parsing/building drift
  */
-// writeFileSync(join(__dirname, "openimmo-full-stub.rebuilt.xml"), rebuiltXml);
 deepStrictEqual(originalXml, rebuiltXml);
 
-// biome-ignore lint/suspicious/noConsole: <example file>
-console.log("xml -> object -> xml round-trip ok");
+Promise.allSettled([
+	validateXML(originalXml, join(__dirname, "openimmo_127b.xsd")).then(
+		result => {
+			try {
+				assert(result.valid);
+			} catch (_) {
+				// biome-ignore lint/suspicious/noConsole: <log validation errors>
+				console.log(result.messages);
+				process.exit(1);
+			}
+		},
+	),
+	validateXML(rebuiltXml, join(__dirname, "openimmo_127b.xsd")).then(
+		result => {
+			try {
+				assert(result.valid);
+			} catch (_) {
+				// biome-ignore lint/suspicious/noConsole: <log validation errors>
+				console.log(result.messages);
+				process.exit(1);
+			}
+		},
+	),
+]).then(() => {
+	// biome-ignore lint/suspicious/noConsole: <example file>
+	console.log("xml -> object -> xml round-trip ok");
+});

@@ -1,8 +1,8 @@
-import { deepStrictEqual } from "node:assert";
-import { writeFileSync } from "node:fs";
+import assert, { deepStrictEqual } from "node:assert";
 import { join } from "node:path";
+import { validateXML } from "xsd-schema-validator";
 import { createBuilder, createParser, loadSchemaSync } from "../src";
-import type { Openimmo, Schema } from "./interfaces";
+import type { Openimmo } from "./interfaces";
 import { stubOpenImmoObj } from "./openimmo-full-stub";
 
 /**
@@ -33,7 +33,17 @@ const myOpenImmoXmlParsedBackToJs = parse(myOpenImmoObjToXml);
  */
 deepStrictEqual(stubOpenImmoObj.openimmo, myOpenImmoXmlParsedBackToJs);
 
-// biome-ignore lint/suspicious/noConsole: <example file>
-console.log("object -> xml -> object round-trip ok");
+validateXML(myOpenImmoObjToXml, join(__dirname, "openimmo_127b.xsd")).then(
+	result => {
+		try {
+			assert(result.valid);
 
-// writeFileSync(join(__dirname, "my-open-immo-2.xml"), myOpenImmoObjToXml);
+			// biome-ignore lint/suspicious/noConsole: <example file>
+			console.log("object -> xml -> object round-trip ok");
+		} catch (_) {
+			// biome-ignore lint/suspicious/noConsole: <log validation errors>
+			console.log(result.messages);
+			process.exit(1);
+		}
+	},
+);

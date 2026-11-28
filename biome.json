@@ -15,6 +15,7 @@
 			"!**/tests/stubs/*.interfaces.ts",
 			"!**/tests/stubs/*.json",
 			"!**/examples/interfaces.ts",
+			"!**/e2e/fixtures/*/interfaces.ts",
 			"!**/examples/output.xml",
 			"!**/tests/assets",
 			"!**/issue_schemas",
