@@ -1,0 +1,6 @@
+# The e2e suite is the behaviour contract; see CONTRIBUTING.md.
+/e2e/                   @MarcoASilva
+/vitest.e2e.config.mts  @MarcoASilva
+
+# Owns the guard itself (contract-guard workflow, PR template, this file).
+/.github/               @MarcoASilva

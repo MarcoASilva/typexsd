@@ -234,6 +234,12 @@ loadSchemaSync('main.xsd', {
 The XML namespace (`xml:lang`, `xml:space`, ...) is built in and never fetched.
 Documents are decoded according to their XML declaration (`iso-8859-1`, ...).
 
+## contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). The end-to-end suite in `e2e/` is the
+compatibility contract of the public API: a PR that changes it changes the
+library's behaviour, and must explain why.
+
 ## upgrading from 0.3
 
 -   Generated types are accurate about cardinality: elements with

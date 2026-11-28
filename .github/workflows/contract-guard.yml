@@ -1,0 +1,27 @@
+name: contract-guard
+
+# Separate from e2e.yml: it also reruns when the PR description is edited,
+# which must not replace an e2e result for the same commit.
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+
+permissions:
+    contents: read
+
+jobs:
+    contract-guard:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: List changed files
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+              run: git diff --name-only "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/changed-files.txt"
+            - name: Require an explanation for e2e contract changes
+              env:
+                  PR_BODY: ${{ github.event.pull_request.body }}
+              run: node .github/scripts/check-e2e-justification.mjs "$RUNNER_TEMP/changed-files.txt"
